@@ -4,7 +4,7 @@ var classNames = require("classnames");
 var React = require("react");
 var _ = require("lodash");
 
-var TexButtons = require("./tex-buttons.jsx");
+var TexButtons = require("./tex-buttons");
 
 // TODO(alex): Package MathQuill
 var MathQuill = window.MathQuill;
@@ -17,7 +17,7 @@ var MathInput = React.createClass({
         onChange: PT.func.isRequired,
         convertDotToTimes: PT.bool,
         buttonsVisible: PT.oneOf(['always', 'never', 'focused']),
-        buttonSets: TexButtons.buttonSetsType.isRequired,
+        //buttonSets: TexButtons.buttonSetsType.isRequired,
         onFocus: PT.func,
         onBlur: PT.func
     },
@@ -37,7 +37,7 @@ var MathInput = React.createClass({
         }
 
         var buttons = null;
-        if (this._shouldShowButtons()) {
+        if (false || this._shouldShowButtons()) {
             buttons = <TexButtons
                 sets={this.props.buttonSets}
                 className="math-input-buttons absolute"
@@ -97,6 +97,7 @@ var MathInput = React.createClass({
     },
 
     _shouldShowButtons: function() {
+        return false;
         if (this.props.buttonsVisible === 'always') {
             return true;
         } else if (this.props.buttonsVisible === 'never') {

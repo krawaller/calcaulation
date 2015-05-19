@@ -1,6 +1,7 @@
 {
   "scripts": {
     "build": "browserify --debug -t [reactify --es6] src/index.js > bundle.js",
+    "build2": "browserify --debug -t [reactify --es6] src/index2.js > bundle2.js",
     "build-dist": "NODE_EMV?production browserify -t [reactify --es6] src/index.js | uglifyjs -m > bundle.min.js"
   },
   "devDependencies": {

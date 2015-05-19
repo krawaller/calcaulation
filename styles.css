@@ -1,3 +1,7 @@
 .mathquill-editable {
 	min-width: 150px;
 }
+
+.noborder {
+	border: 0;
+}
