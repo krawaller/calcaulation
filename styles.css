@@ -5,3 +5,108 @@
 .noborder {
 	border: 0;
 }
+
+.editentry {
+	border: 1px solid #CCC;
+	border-radius: 10px;
+	padding: 1em;
+	padding-top: 0;
+	display: inline-block;
+}
+
+.entrycontainer {
+	margin-bottom: 2em;
+}
+
+body {
+	padding: 1em;
+}
+
+.wrapper {
+	margin: 0 auto;
+	position: relative;
+	max-width: 850px;
+	padding-bottom: 10em;
+}
+
+.togglers {
+	position: fixed;
+	top: 15px;
+	right: 15px;
+}
+
+.togglers button {
+	display: block;
+	margin-bottom: 1em;
+}
+
+.rowbuttons {
+	text-align: center;
+}
+
+.rowdelbutton {
+	margin-right: 4px;
+}
+
+.calctable td > div {
+	display: inline-block;
+}
+
+.rowbuttons button {
+	margin-right: 1em;
+}
+
+.calctable {
+	border-collapse: collapse;
+	min-width: 300px;
+}
+
+.calctable td {
+	vertical-align: middle;
+	text-align: center;
+	padding: 1em 0;
+}
+
+.help {
+	position: fixed;
+	top: 6em;
+	left: 6em;
+	right: 6em;
+	bottom: 10em;
+	padding: 1em;
+	border: 1px solid #CCC;
+	border-radius: 10px;
+	background-color: #EEE;
+	overflow-y: scroll;
+}
+
+.datalink {
+	position: fixed;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	padding-top: 5px;
+	height: 90px;
+	text-align: center;
+	border-top: 1px solid #CCC;
+	background-color: #EEE;
+}
+
+.datalink p {
+	margin-top: 0;
+	margin-bottom: 10px;
+	font-size: 12px;
+}
+
+.datalink a {
+	display: block;
+	font-size: 4px;
+}
+
+tr.eqrow > td:first-child {
+	text-align: right;
+}
+
+tr.eqrow > td:last-child {
+	text-align: left;
+}

@@ -1,71 +1,193 @@
 /** @jsx React.DOM */
 
 var React = require('react'),
-    Mathbox = require('./mathbox');
+    Entry = require('./entry'),
+    Mathbox = require('./mathbox.js'),
     _ = require('lodash');
 
 var Home = React.createClass({
     readStateFromQuery: function(){
-        return decodeURIComponent(window.location.hash.replace(/^\#/,"")).split("__");
+        var json, hash = decodeURIComponent(window.location.hash.replace(/^\#/,""))||"[]";
+        try {
+            json = JSON.parse(hash);
+            return json;
+        } catch(e) {
+            console.log("failed to parse!",hash,e);
+            alert("Misslyckades med att läsa in uträkning!");
+            return [];
+        }
     },
-    saveStateToQuery: function(){
-        return encodeURIComponent(this.seeds.join("__"));
+    generateNewHash: function(){
+        var l = window.location, jsonstr;
+        try {
+            jsonstr = JSON.stringify(this.seeds);
+            return "#"+encodeURIComponent(jsonstr);
+        } catch(e) {
+            console.log("failed to stringify",this.seeds,e);
+            alert("Misslyckades med att spara uträkning!");
+            return "";
+        }
+    },
+    generateNewUri: function(){
+        var l = window.location, hash = this.generateNewHash();
+        return l.href.split("#")[0] + hash;
     },
     getInitialState: function(){
         this.seeds = this.readStateFromQuery();
-        return { content: this.seeds, editing: false, href: window.location.href };
+        return !this.seeds || !this.seeds.length || (this.seeds.length === 1 && (this.seeds[0] === '' || !this.seeds[0].length)) ? {
+            content: (this.seeds=[""]),
+            fromscratch: true,
+            editing: true,
+            href: window.location.href
+        } : {
+            content: this.seeds,
+            editing: false,
+            href: window.location.href
+        }
     },
-    update: function(id,latex){
-        this.seeds = _.slice(this.seeds,0,id).concat([latex]).concat(_.slice(this.seeds,id+1,666));
-        console.log("SO",this.seeds);
+    onUpdate: function(id,data,forceredraw){
+        console.log("OnUpdate called for box",id,"with data",data,"and force",forceredraw,", seeds are now",this.seeds);
+        this.seeds = _.slice(this.seeds,0,id).concat([data]).concat(_.slice(this.seeds,id+1,666));
+        if (forceredraw){
+            this.setState({content:this.seeds});
+        }
     },
-    addRow: function(){
-        this.setState({content:(this.seeds=this.seeds.concat(""))});
+    onMoveUp: function(id){
+        var s = this.seeds, a = _.slice(s,0,id-1).concat([ s[id], s[id-1] ]).concat(_.slice(s,id+1,666));
+        this.setState({content: (this.seeds = a)});
     },
-    removeRow: function(){
-        this.setState({content:(this.seeds=_.dropRight(this.seeds))});
+    onMoveDown: function(id){
+        var s = this.seeds, a = _.slice(s,0,id).concat([ s[id+1], s[id] ]).concat(_.slice(s,id+2,666));
+        this.setState({content: (this.seeds = a)});
+    },
+    onDelete: function(id){
+        this.setState({content: (this.seeds = _.slice(this.seeds,0,id).concat(_.slice(this.seeds,id+1,666)))});
     },
     startEdit: function(){
         this.setState({editing:true});
     },
     cancelEdit: function(){
-        this.setState({editing:false,content:this.readStateFromQuery()});
+        this.setState({editing:false,content:(this.seeds=(this.savedseeds||this.readStateFromQuery()))});
     },
     saveEdit: function(){
-        var url = window.location.hash="#"+this.saveStateToQuery();
-        console.log("Nu jäklar",url);
+        var url = this.generateNewUri();
+        window.location = url;
+        console.log("Sparar uträkning!",url);
+        this.savedseeds = this.seeds;
         this.setState({
             content: this.seeds,
             editing: false,
-            href: window.location.pathname+"#"+this.saveStateToQuery()
+            fromscratch: false,
+            href: url
         });
     },
+    newCalc: function(){
+        window.location.hash=""
+        this.setState(this.getInitialState());
+    },
+    addNewBox: function(kind){
+        this.setState({content:(this.seeds=this.seeds.concat(kind))});
+    },
+    toggleHelp: function(){
+        this.setState({showhelp:!this.state.showhelp});
+    },
     render: function(){
-        var e = this.state.editing;
+        var e = this.state.editing || this.state.fromscratch;
         return (
             <div>
-                <h4>Beskrivning</h4>
-                <Mathbox key="desc" id="0" seed={this.state.content[0]} editing={e} type='textbox' update={this.update.bind(this,0)} />
-                <h4>Beräkningar</h4>
-                {_.map(_.tail(this.state.content),function(txt,n){
-                    return (
-                        <div key={n+1}>
-                            <Mathbox seed={txt} id={n+1} type={e?'editable':''} update={this.update.bind(this,n+1)} />
-                        </div>
-                    );
-                }.bind(this))}
-                <p>
-                    {!e?<button onClick={this.startEdit}>Ändra</button>:(
-                        <div>
-                            <button onClick={this.addRow}>Ny rad</button>
-                            {this.state.content.length>1?<button onClick={this.removeRow}>Ta bort rad</button>:''}
-                            <button onClick={this.cancelEdit}>Avbryt</button>
-                            <button onClick={this.saveEdit}>Spara</button>
-                        </div>
-                    )}
-                </p>
-                <h4>Länk</h4>
-                <a href={this.state.href}>{this.state.href}</a>
+                <div className="wrapper">
+                    <div className="togglers">
+                        <button onClick={this.toggleHelp} type="button" className="btn btn-default btn-sm">
+                            <span className="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+                            {' '}Hjälp
+                        </button>
+                        {!e?(
+                            <div>
+                                <button onClick={this.startEdit} type="button" className="btn btn-default btn-sm">
+                                    <span className="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                                    {' '}Ändra
+                                </button>
+                                {!this.state.fromscratch && <button onClick={this.newCalc} type="button" className="btn btn-default btn-sm">
+                                    <span className="glyphicon glyphicon-certificate" aria-hidden="true"></span>
+                                    {' '}Ny
+                                </button>}
+                            </div>
+                        ):(
+                            <div>
+                                {!this.state.fromscratch && <button onClick={this.cancelEdit} type="button" className="btn btn-default btn-sm">
+                                    <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                    {' '}Avbryt
+                                </button>}
+                                <button onClick={this.saveEdit} type="button" className="btn btn-default btn-sm">
+                                    <span className="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
+                                    {' '}Spara
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                    <div>
+                        {_.map(this.state.content,function(data,n){
+                            return <div key={n} className='entrycontainer'>
+                                <Entry
+                                    key={n} pos={n} outof={this.state.content.length} data={data} editing={e}
+                                    onUpdate={this.onUpdate.bind(this,n)} 
+                                    onMoveUp={this.onMoveUp.bind(this,n)}
+                                    onMoveDown={this.onMoveDown.bind(this,n)}
+                                    onDelete={this.onDelete.bind(this,n)}
+                                />
+                            </div>;
+                        },this)}
+                    </div>
+                    {e && <div className="rowbuttons">
+                        <button onClick={this.addNewBox.bind(this,'')} type="button" className="btn btn-default btn-sm">
+                            <span className="glyphicon glyphicon-text-size" aria-hidden="true"></span>
+                            {' '}Lägg till ny textbox
+                        </button>
+                        <button onClick={this.addNewBox.bind(this,[['']])} type="button" className="btn btn-default btn-sm">
+                            <span className="glyphicon glyphicon-align-justify" aria-hidden="true"></span>
+                            {' '}Lägg till ny mattebox
+                        </button>
+                    </div>}
+                </div>
+                {!this.state.fromscratch && <div className="datalink">
+                    <p>Dela denna uträkning genom att kopiera och skicka länken nedan!</p>
+                    <a href={this.state.href}>{this.state.href}</a>
+                </div>}
+                {this.state.showhelp ? <div className="help" onClick={this.toggleHelp}>
+                    <p>
+Välkommen till det matematiska redovisningsverktyget! Här kan du skapa en redovisning och sedan enkelt dela den med
+andra genom att kopiera och skicka den genererade länken som syns längst ned på sidan.
+                    </p>
+                    <p>
+En redovisning består av en eller flera <strong>boxar</strong> med information. Du kan lägga till och ta bort boxar
+(fast du kan inte ta bort den sista), samt flytta dem upp och ned. Det finns två olika sorters boxar:
+                    </p>
+                    <p>
+                        <ul>
+                            <li>
+<strong>Textboxen</strong> är tänkt att fungera som ett vanligt textstycke. Här skriver du in vanlig flödande text,
+exempelvis en inledande beskrivning av uppgiften och/eller ett avslutande svar. Du kan också gå in i ett "matteläge" i
+textboxen genom att skriva ett dollartecken ($)!
+                            </li>
+                            <li>
+<p><strong>Matteboxen</strong> är en matematisk uträkning bestående av en eller flera rader. Om varje rad är en ekvation så
+kommer matteboxen se till att likhetstecknena på de olika raderna ligger i en lodrät linje, så att det blir lättare att
+se vad som händer i höger- respektive vänsterledet.</p>
+<p>I framtiden är det tänkt att du via knappar ska få hjälp att skriva in mer avancerade matematik, men i dagsläget måste du
+skriva in speciella kommandon. Här är en lista över de vanligaste! Notera att varje kommando måste avslutas med ett
+mellanslag.</p>
+<ul>
+    <li><strong>Roten ur</strong> skrivs med <code>\nthroot</code>: <Mathbox data="\nthroot 3 x"/></li>
+    <li><strong>Pi</strong> skrivs med <code>\pi</code>: <Mathbox data="x+\pi"/></li>
+</ul>
+<p>
+Du kan lägga till, ta bort och flytta rader i en mattebox, precis på samma sätt som du kan göra med boxarna i redovisningen.
+När du lägger till en rad så kan du välja mellan en tom eller en kopia på den senaste raden.
+</p>
+                            </li>
+                        </ul>
+                    </p>
+                </div> : ''}
             </div>
         );
     }
