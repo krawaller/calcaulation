@@ -179,11 +179,11 @@ var Home = React.createClass({
                         <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
                     </button>
                     <p>
-Välkommen till det matematiska redovisningsverktyget! Här kan du skapa en redovisning och sedan enkelt dela den med
-andra genom att kopiera och skicka den genererade länken som syns längst ned på sidan.
+Välkommen till det matematiska redovisningsverktyget! Här kan du skapa en <strong>redovisning</strong> och sedan enkelt
+<strong>dela</strong> den med andra genom att kopiera och skicka den genererade länken.
                     </p>
                     <p>
-En redovisning består av en eller flera <strong>boxar</strong> med information. Du kan lägga till och ta bort boxar
+En redovisning består av en eller flera <strong>boxar</strong> med information. Du kan kopiera, lägga till och ta bort boxar
 (fast du kan inte ta bort den sista), samt flytta dem upp och ned. Det finns två olika sorters boxar:
                     </p>
                     <p>
@@ -207,8 +207,7 @@ mellanslag.</p>
     <li><strong>Plus minus</strong> skrivs med <code>\plusminus</code>: <Mathbox data="x\plusminus 3"/></li>
 </ul>
 <p>
-Du kan lägga till, ta bort och flytta rader i en mattebox, precis på samma sätt som du kan göra med boxarna i redovisningen.
-När du lägger till en rad så kan du välja mellan en tom eller en kopia på den senaste raden.
+Du kan lägga till, kopiera, ta bort och flytta rader i en mattebox, precis på samma sätt som du kan göra med boxarna i redovisningen.
 </p>
                             </li>
                         </ul>
