@@ -1,3 +1,8 @@
+button {
+	border-radius: 4px;
+	margin: 3px;
+}
+
 .editbtns {
 	position: absolute;
 	top: 6em;
