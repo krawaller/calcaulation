@@ -22,6 +22,9 @@ var Entry = React.createClass({
                             {p.outof>1 ? <button onClick={p.onDelete} type="button" className="btn btn-default btn-sm">
                                 <span className="glyphicon glyphicon-trash" aria-hidden="true"></span>
                             </button>: ''}{' '}
+                            <button onClick={p.onCopy} type="button" className="btn btn-default btn-sm">
+                                <span className="glyphicon glyphicon-copy" aria-hidden="true"></span>
+                            </button>
                             {type}{' '}
                             {n ? <button onClick={p.onMoveUp} type="button" className="btn btn-default btn-sm">
                                 <span className="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>

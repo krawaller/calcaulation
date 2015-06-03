@@ -52,6 +52,10 @@ var Home = React.createClass({
             this.setState({content:this.seeds});
         }
     },
+    onCopy: function(id){
+        this.seeds = _.slice(this.seeds,0,id).concat([this.seeds[id],this.seeds[id]]).concat(_.slice(this.seeds,id+1,666));
+        this.setState({content:this.seeds});
+    },
     onMoveUp: function(id){
         var s = this.seeds, a = _.slice(s,0,id-1).concat([ s[id], s[id-1] ]).concat(_.slice(s,id+1,666));
         this.setState({content: (this.seeds = a)});
@@ -89,7 +93,16 @@ var Home = React.createClass({
         this.setState({content:(this.seeds=this.seeds.concat(kind))});
     },
     toggleHelp: function(){
-        this.setState({showhelp:!this.state.showhelp});
+        this.setState({
+            showhelp: !this.state.showhelp,
+            showlink:false
+        });
+    },
+    toggleLink: function(){
+        this.setState({
+            showlink: !this.state.showlink,
+            showhelp:false
+        });
     },
     render: function(){
         var e = this.state.editing || this.state.fromscratch;
@@ -101,23 +114,27 @@ var Home = React.createClass({
                             <span className="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
                             {' '}Hjälp
                         </button>
+                        {!this.state.fromscratch ? <p><button onClick={this.toggleLink} type="button" className="btn btn-default btn-sm">
+                            <span className="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
+                            {' '}Dela
+                        </button></p>:''}
                         {!e?(
-                            <div>
-                                <button onClick={this.startEdit} type="button" className="btn btn-default btn-sm">
+                            <div className='editbtns'>
+                                <p><button onClick={this.startEdit} type="button" className="btn btn-default btn-sm">
                                     <span className="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                                     {' '}Ändra
-                                </button>
-                                {!this.state.fromscratch && <button onClick={this.newCalc} type="button" className="btn btn-default btn-sm">
+                                </button></p>
+                                {!this.state.fromscratch ? <button onClick={this.newCalc} type="button" className="btn btn-default btn-sm">
                                     <span className="glyphicon glyphicon-certificate" aria-hidden="true"></span>
                                     {' '}Ny
-                                </button>}
+                                </button> : ''}
                             </div>
                         ):(
-                            <div>
-                                {!this.state.fromscratch && <button onClick={this.cancelEdit} type="button" className="btn btn-default btn-sm">
+                            <div className='editbtns'>
+                                {!this.state.fromscratch ? <p><button onClick={this.cancelEdit} type="button" className="btn btn-default btn-sm">
                                     <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
                                     {' '}Avbryt
-                                </button>}
+                                </button></p> : ''}
                                 <button onClick={this.saveEdit} type="button" className="btn btn-default btn-sm">
                                     <span className="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
                                     {' '}Spara
@@ -125,7 +142,7 @@ var Home = React.createClass({
                             </div>
                         )}
                     </div>
-                    <div>
+                    <div className="entries">
                         {_.map(this.state.content,function(data,n){
                             return <div key={n} className='entrycontainer'>
                                 <Entry
@@ -134,6 +151,7 @@ var Home = React.createClass({
                                     onMoveUp={this.onMoveUp.bind(this,n)}
                                     onMoveDown={this.onMoveDown.bind(this,n)}
                                     onDelete={this.onDelete.bind(this,n)}
+                                    onCopy={this.onCopy.bind(this,n)}
                                 />
                             </div>;
                         },this)}
@@ -149,11 +167,17 @@ var Home = React.createClass({
                         </button>
                     </div>}
                 </div>
-                {!this.state.fromscratch && <div className="datalink">
+                {this.state.showlink ? <div className="datalink">
+                    <button onClick={this.toggleLink} type="button" className="closer btn btn-default btn-sm">
+                        <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    </button>
                     <p>Dela denna uträkning genom att kopiera och skicka länken nedan!</p>
                     <a href={this.state.href}>{this.state.href}</a>
-                </div>}
-                {this.state.showhelp ? <div className="help" onClick={this.toggleHelp}>
+                </div> : ''}
+                {this.state.showhelp ? <div className="help">
+                    <button onClick={this.toggleHelp} type="button" className="closer btn btn-default btn-sm">
+                        <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    </button>
                     <p>
 Välkommen till det matematiska redovisningsverktyget! Här kan du skapa en redovisning och sedan enkelt dela den med
 andra genom att kopiera och skicka den genererade länken som syns längst ned på sidan.
@@ -177,8 +201,10 @@ se vad som händer i höger- respektive vänsterledet.</p>
 skriva in speciella kommandon. Här är en lista över de vanligaste! Notera att varje kommando måste avslutas med ett
 mellanslag.</p>
 <ul>
-    <li><strong>Roten ur</strong> skrivs med <code>\nthroot</code>: <Mathbox data="\nthroot 3 x"/></li>
+    <li><strong>Kvadratrot</strong> skrivs med <code>\sqrt</code>: <Mathbox data="\sqrt 3 x"/></li>
+    <li><strong>Övriga rötter</strong> skrivs med <code>\nthroot</code>: <Mathbox data="\nthroot 3 x"/></li>
     <li><strong>Pi</strong> skrivs med <code>\pi</code>: <Mathbox data="x+\pi"/></li>
+    <li><strong>Plus minus</strong> skrivs med <code>\plusminus</code>: <Mathbox data="x\plusminus 3"/></li>
 </ul>
 <p>
 Du kan lägga till, ta bort och flytta rader i en mattebox, precis på samma sätt som du kan göra med boxarna i redovisningen.

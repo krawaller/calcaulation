@@ -9,8 +9,8 @@ var Calc = React.createClass({
         this.data = _.slice(this.data,0,id).concat([latex]).concat(_.slice(this.data,id+1,666));
         this.props.onUpdate(this.data);
     },
-    addRow: function(copy){
-        this.data = (this.data=this.data.concat(copy ? this.data[this.data.length-1] : ""));
+    addRow: function(){
+        this.data = (this.data=this.data.concat(""));
         this.props.onUpdate(this.data,true);
     },
     removeRow: function(n){
@@ -18,6 +18,28 @@ var Calc = React.createClass({
             this.data = _.slice(this.data,0,n).concat(_.slice(this.data,n+1,666));
             this.props.onUpdate(this.data,true);
         }.bind(this));
+    },
+    copyRow: function(n){
+        setTimeout(function(){
+            this.data = _.slice(this.data,0,n).concat([this.data[n],this.data[n]]).concat(_.slice(this.data,n+1,666));
+            this.props.onUpdate(this.data,true);
+        }.bind(this));
+    },
+    moveRowUp: function(n){
+        setTimeout(function(){
+            this.data = _.slice(this.data,0,n-1).concat([this.data[n],this.data[n-1]]).concat(_.slice(this.data,n+1,666));
+            this.props.onUpdate(this.data,true);
+        }.bind(this));
+        //var s = this.seeds, a = _.slice(s,0,id-1).concat([ s[id], s[id-1] ]).concat(_.slice(s,id+1,666));
+        //this.setState({content: (this.seeds = a)});
+    },
+    moveRowDown: function(n){
+        setTimeout(function(){
+            this.data = _.slice(this.data,0,n).concat([this.data[n+1],this.data[n]]).concat(_.slice(this.data,n+2,666));
+            this.props.onUpdate(this.data,true);
+        }.bind(this));
+        // var s = this.seeds, a = _.slice(s,0,id).concat([ s[id+1], s[id] ]).concat(_.slice(s,id+2,666));
+        // this.setState({content: (this.seeds = a)});
     },
     render: function(){
         var e = this.props.editing,
@@ -32,10 +54,19 @@ var Calc = React.createClass({
                             return e ? (
                                 <tr key={n}>
                                     <td>
-                                    {e && this.props.data.length>1? <button onClick={this.removeRow.bind(this,n)} type="button" className="btn btn-default btn-xs">
+                                    {this.props.data.length>1? <button onClick={this.removeRow.bind(this,n)} type="button" className="btn btn-default btn-xs">
                                         <span className="glyphicon glyphicon-trash" aria-hidden="true"></span>
                                     </button>:''}
+                                    {' '}<button onClick={this.copyRow.bind(this,n)} type="button" className="btn btn-default btn-xs">
+                                        <span className="glyphicon glyphicon-copy" aria-hidden="true"></span>
+                                    </button>
                                     {' '}<Mathbox editing={true} data={txt} type={e?'editable':''} onUpdate={this.updateChild.bind(this,n)} />
+                                    {n ? <button onClick={this.moveRowUp.bind(this,n)} type="button" className="btn btn-default btn-xs">
+                                        <span className="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+                                    </button>:''}
+                                    {this.data.length-1>n ? <button onClick={this.moveRowDown.bind(this,n)} type="button" className="btn btn-default btn-xs">
+                                        <span className="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+                                    </button>:''}
                                     </td>
                                 </tr>
                             ) : eqtable ? (
@@ -56,13 +87,9 @@ var Calc = React.createClass({
                 </table>
                 {e && (
                     <div className="rowbuttons">
-                        <button onClick={this.addRow.bind(this,false)} type="button" className="btn btn-default btn-xs">
+                        <button onClick={this.addRow.bind(this)} type="button" className="btn btn-default btn-xs">
                             <span className="glyphicon glyphicon-minus" aria-hidden="true"></span>
                             {' '}Lägg till tom rad
-                        </button>
-                        <button onClick={this.addRow.bind(this,true)} type="button" className="btn btn-default btn-xs">
-                            <span className="glyphicon glyphicon-copy" aria-hidden="true"></span>
-                            {' '}Lägg till kopia av sista raden
                         </button>
                     </div>
                 )}

@@ -1,3 +1,9 @@
+.editbtns {
+	position: absolute;
+	top: 6em;
+	right: 0;
+}
+
 .mathquill-editable {
 	min-width: 150px;
 }
@@ -33,11 +39,8 @@ body {
 	position: fixed;
 	top: 15px;
 	right: 15px;
-}
-
-.togglers button {
-	display: block;
-	margin-bottom: 1em;
+	min-width: 70px;
+	text-align: right;
 }
 
 .rowbuttons {
@@ -67,7 +70,7 @@ body {
 	padding: 1em 0;
 }
 
-.help {
+.help, .datalink {
 	position: fixed;
 	top: 6em;
 	left: 6em;
@@ -80,18 +83,6 @@ body {
 	overflow-y: scroll;
 }
 
-.datalink {
-	position: fixed;
-	bottom: 0;
-	right: 0;
-	left: 0;
-	padding-top: 5px;
-	height: 90px;
-	text-align: center;
-	border-top: 1px solid #CCC;
-	background-color: #EEE;
-}
-
 .datalink p {
 	margin-top: 0;
 	margin-bottom: 10px;
@@ -100,7 +91,8 @@ body {
 
 .datalink a {
 	display: block;
-	font-size: 4px;
+	margin-top: 3em;
+	font-size: 0.9em;
 }
 
 tr.eqrow > td:first-child {
@@ -110,3 +102,19 @@ tr.eqrow > td:first-child {
 tr.eqrow > td:last-child {
 	text-align: left;
 }
+
+.entries {
+	text-align: center;
+}
+
+.calc {
+	display: inline-block;
+}
+
+.closer {
+	float: right;
+	margin: 1em;
+}
+
+/* BOOTSTRAP STOLEN STUFF */
+
